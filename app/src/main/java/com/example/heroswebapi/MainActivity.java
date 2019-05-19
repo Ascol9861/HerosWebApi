@@ -7,6 +7,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import herosapi.HeroesAPI;
 import model.Heroes;
 import retrofit2.Call;
@@ -33,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Save();
+//                Save();
+                SaveUsingFieldMap();
             }
         });
     }
@@ -51,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
         HeroesAPI heroesAPI = retrofit.create(HeroesAPI.class);
 
-        Call<Void> heroesCall = heroesAPI.addHero(heroes);
+
+        Call<Void> heroesCall = heroesAPI.addHero(name, desc);
 
         heroesCall.enqueue(new Callback<Void>() {
             @Override
@@ -70,5 +75,40 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    public void SaveUsingFieldMap(){
+        String name = etName.getText().toString();
+        String desc = etDesc.getText().toString();
+
+        Map<String, String> map = new HashMap<>();
+        map.put("name",name);
+        map.put("desc", desc);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Url.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        HeroesAPI heroesAPI = retrofit.create(HeroesAPI.class);
+
+
+        Call<Void> heroesCall = heroesAPI.addHero(map);
+
+        heroesCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(MainActivity.this, "Code" + response.code(), Toast.LENGTH_SHORT).show();
+                }
+
+                Toast.makeText(MainActivity.this, "Successfully Added", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(MainActivity.this,"Failed" + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

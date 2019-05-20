@@ -25,6 +25,5 @@ public class ImageViewActivity extends AppCompatActivity {
     private void loadFromURL(){
         StrictMode();
 
-
     }
 }
